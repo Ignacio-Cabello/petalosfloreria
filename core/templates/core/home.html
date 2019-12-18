@@ -1,0 +1,68 @@
+{% extends 'core/base.html' %}
+
+{% load static %}
+
+{% block contenido %}
+
+<div class="jumbotron" style="background-color:brown; color: white;">
+    <h1 class="display-4">Bienvenido a Floreria Petalos</h1>
+    <p class="lead">El sitio donde puedes encontrar las mejores arreglos florales al mejor precio</p>
+    <hr class="my-4">
+  </div>
+
+<div class="contenedor_flores">
+    <h2 class="titulo_contenedor_flor">FLORES EN OFERTAS</h2>
+    {% for f in flores %}
+    <div class="flor">
+        {% if f.imagen %}
+        <img src="{{ f.imagen.url }}" alt="Caratula 1">
+        <h5 style="text-align: center;">{{ f.nombre }}</h5>
+        <h5 style="text-align: center; color: slateblue;">${{ f.precio }}</h5>
+        <h6 style="text-align: center;">{{ f.descripcion }}</h6>
+        <h6 style="text-align: center;">Quedan: {{ f.stock }}</h6>
+        <h6 style="text-align: center; color: green;">{{ f.estado }}</h6
+        {% endif %}
+        <a href="#">Agregar</a>
+    </div>
+    {% endfor %}
+</div>
+<br>
+<div class="contenedor_flores" style="background-color: darksalmon; margin-bottom: 20px;">
+        <h2 class="titulo_contenedor_pelicula">PREVENTA / PRÓXIMAS FLORES</h2>
+        <div class="flor">
+            <img src="{% static 'core/img/flor4.jpg' %}" alt="Caratula 1">
+            <h5 style="text-align: center;">ESP1012</h5>
+            <h5 style="text-align: center; color: slateblue;">$50.000</h5>
+            <h6 style="text-align: center;">Listo</h6>
+            <h6 style="text-align: center; color: red;">No Disponible</h6>
+            <a href="#">Reservar</a>
+        </div>
+        <div class="flor">
+            <img src="{% static 'core/img/flor1.jpg' %}" alt="Caratula 1">
+            <h5 style="text-align: center;">Caja de flores con rosas tipo cono</h5>
+            <h5 style="text-align: center; color: slateblue;">$25.000</h5>
+            <h6 style="text-align: center;">Preciosa caja para darle a la madre</h6>
+            <6 style="text-align: center; color: red;">No Disponible</h6>
+        <a href="#">Reservar</a>
+        </div>
+        <div class="flor">
+            <img src="{% static 'core/img/flor2.jpg' %}" alt="Caratula 1">
+            <h5>Arreglo floral grandes con flores blancas</h5>
+            <h5 style="text-align: center; color: slateblue;">$50.000</h5>
+            <h6 style="text-align: center;">Para regalar a cualquier persona</h6>
+            <h6 style="text-align: center; color: green;">No Disponible</h6>
+            <a href="#">Reservar</a>
+        </div>
+        <div class="flor">
+            <img src="{% static 'core/img/flor3.jpg' %}" alt="Caratula 1">
+            <h5 style="text-align: center;">Primaveral de tres niveles</h5>
+            <h5 style="text-align: center; color: slateblue;">$50.000</h5>
+            <h6 style="text-align: center;">Listo</h6>
+            <h6 style="text-align: center; color: green;">No Disponible</h6>
+            <a href="#">Reservar</a>
+        </div>
+    </div>
+
+
+
+{% endblock %}

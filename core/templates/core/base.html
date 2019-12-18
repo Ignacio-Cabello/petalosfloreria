@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es"> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>FloreriaPetalos</title>
+
+    {% load pwa %}
+    {% progressive_web_app_meta %}
+
+
+
+
+    {% load static %}
+    {% block css %}
+    {% endblock %}
+    <link rel="stylesheet" href="{% static '/core/css/estilos.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+
+   <!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/3.9.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.9.0/firebase-messaging.js"></script>
+
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyC0I7j4C_53cOUb4A7xuG0iMuVsFZF3HXk",
+    authDomain: "petalos-37a7c.firebaseapp.com",
+    databaseURL: "https://petalos-37a7c.firebaseio.com",
+    projectId: "petalos-37a7c",
+    storageBucket: "petalos-37a7c.appspot.com",
+    messagingSenderId: "734262390059",
+    appId: "1:734262390059:web:1e6496867c5e3e65ed696e"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+  let messaging = firebase.messaging();
+
+  //primero tenemos qu enleazar el serviceworker.
+  navigator.serviceWorker
+  .register('./serviceworker.js')
+  .then(function(register){
+     
+      messaging.useServiceWorker(register);
+
+      //solicitamos el permiso para recibir notificcaciones al usuario
+      messaging.requestPermission()
+      .then(function(){
+          console.log("el usuario ha aceptado recibir notificaciones")
+          
+          return messaging.getToken();
+
+      })
+      .then(function(token){
+          console.log(token);
+
+          //enviaremos el token hacia django para guardarlo en la base de datos
+
+          fetch('guardar-token/', {
+              method:'post',
+              headers:{
+                  'Content-Type':'application/json',
+                  'Accept':'application/json'
+              },
+              body:JSON.stringify({
+                  'token':token
+              })
+          })
+          .then(function(resultado){
+              console.log("se ha guardado el token")
+          })
+          .catch(function(e){
+              console.log("no se ha podido guardar el token")
+          })
+      })
+      .catch(function(e){
+          console.log("el usuario no ha aceptado")
+
+      })
+
+  })
+
+  //programamos la recepcion de las notificaciones push
+
+  messaging.onMessage(function(payload) {
+      console.log("Ha llegad notificacion")
+
+      let data = payload;
+      console.log(data);
+
+      let title = payload.notification.title;
+
+      let options = {
+          body:payload.notification.body,
+          icon:payload.notification.icon
+      }
+
+      let mensaje = new Notification(title, options);
+  });
+
+
+
+</script>
+
+
+
+</head>
+<body style=" background-color:black">
+    <header>
+      
+        <img src="{% static 'core/img/logo2.png' %}" alt="Logo" class="logo">
+
+        <nav>
+                <ul>
+                        <li>
+                            <a href="{% url 'home' %}">Home</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'galeria' %}">Galeria</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'nueva_flor' %}">Agregar Flor</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'listado_flores' %}">Listar Flores</a>
+                        </li>
+                        {% if user.is_authenticated %}
+                        <li>
+                            <a href="#">Usuario: {{ user.username }}</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'logout' %}">Cerrar Sesion</a>
+                        </li>
+                        {% else %}
+                        <li>
+                            <a href="{% url 'login' %}">Iniciar Sesion</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'registro_usuario' %}">Registrar</a>
+                        </li>
+
+                        {% endif %}
+                </ul>   
+        </nav>
+        
+    </header>
+
+    <div id="principal">
+        <br>
+        <div class="container">
+
+            {% block contenido %}
+
+            {% endblock %}
+        </div>
+
+
+    </div>
+
+<!-- Footer -->
+<footer class="page-footer font-small teal pt-4" style="background-color: darkblue; color: white; margin-top: 90px;">
+
+    <!-- Footer Text -->
+    <div class="container-fluid text-center text-md-left" style="background-color: darkblue;">
+  
+      <!-- Grid row -->
+      <div class="row">
+  
+        <!-- Grid column -->
+        <div class="col-md-6 mt-md-0 mt-3">
+  
+          <!-- Content -->
+          <h5 class="text-uppercase font-weight-bold">Floreria Petalos</h5>
+          <p>La floreria petalos es una tienda ficticia en donde se venden arreglos florales.
+              Es precisamente en esta pagina en donde se administraran las flores para su visualizacion para con los usuarios.
+          </p>
+  
+        </div>
+        <!-- Grid column -->
+  
+        <hr class="clearfix w-100 d-md-none pb-3">
+  
+        <!-- Grid column -->
+        <div class="col-md-6 mb-md-0 mb-3">
+  
+          <!-- Content -->
+          <h5 class="text-uppercase font-weight-bold">Desarrolladores</h5>
+          <p>Ignacio Cabello,
+              Juan Muñoz
+          </p>
+  
+        </div>
+        <!-- Grid column -->
+  
+      </div>
+      <!-- Grid row -->
+  
+    </div>
+    <!-- Footer Text -->
+  
+    <!-- Copyright -->
+    <div class="footer-copyright text-center py-3" style="background-color: black;">© 2018 Copyright:
+      <a href="https://mdbootstrap.com/education/bootstrap/"> MDBootstrap.com</a>
+    </div>
+    <!-- Copyright -->
+  
+  </footer>
+  <!-- Footer -->
+
+
+    {% block javascript %}
+    {% endblock %}
+    <script src="js/basico.js"></script>
+</body>
+</html>
